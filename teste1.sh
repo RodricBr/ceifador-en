@@ -75,7 +75,7 @@ elif [[ ! -z "$*" ]] || ! [[ "$*" =~ [A-Za-z] ]]; then
     echo -e "\n${AMARELO}+ Connection :${FIM} ${VERDE}OK${FIM}\n"
   else
     echo -e "\n${AMARELO}+ Connection:${FIM} ${VERMELHO}OFF${FIM}"
-    echo -e "${VERMELHO}- No connection to internet or the web site!\nExiting...${FIM}\n"
+    echo -e "${VERMELHO}- Couldn't stablish a connection to internet or the web site!\nExiting...${FIM}\n"
     exit 1
   fi
 
@@ -99,10 +99,10 @@ elif [[ ! -z "$*" ]] || ! [[ "$*" =~ [A-Za-z] ]]; then
   #}
   
   #function ANALISE_DNS {
-  read -n 1 -p "$(echo -e $AMARELO"? Deseja fazer análise de DNS?"$FIM [${VERDE}Y${FIM}/${VERMELHO}n${FIM}]: )" RESP;
+  read -n 1 -p "$(echo -e $AMARELO"? Do you wish a DNS scan?"$FIM [${VERDE}Y${FIM}/${VERMELHO}n${FIM}]: )" RESP;
   
   case $RESP in
-  *[![:alpha:]]*) echo -e "\n$RESP não é uma resposta válida!" ;
+  *[![:alpha:]]*) echo -e "\n$RESP is not a valid answer!" ;
     exit 1 ;;
   esac
 
@@ -112,10 +112,10 @@ elif [[ ! -z "$*" ]] || ! [[ "$*" =~ [A-Za-z] ]]; then
   [[ "$RESP" != "" ]] && echo "";
   
   if [ "$RESP" = "${RESP#[Nn]}" ]; then
-    echo -e "Análise de DNS: ${VERDE}[+]${FIM}"
+    echo -e "DNS scan: ${VERDE}[+]${FIM}"
     #echo -e "---[ $1 | $HORA ]---" > "$1"-DNS
     printf 'A\nAAAA\nAFSDB\nAPL\nCAA\nCDNSKEY\nCDS\nCERT\nCNAME\nCSYNC\nDHCID\nDLV\nDNAME\nDNSKEY\nDS\nEUI48\nEUI64\nHINFO\nHIP\nIPSECKEY\nKEY\nKX\nLOC\nMX\nNAPTR\nNS\nNSEC\nNSEC3\nNSEC3PARAM\nOPENPGPKEY\nPTR\nRRSIG\nRP\nSIG\nSMIMEA\nSOA\nSRV\nSSHFP\nTA\nTKEY\nTLSA\nTSIG\nTXT\nURI\nMD\nMF\nMAILA\nMB\nMG\nMR\nMINFO\nMAILB\nWKS\nNULL\nA6\nNXT\nKEY\nSIG\nRP\nX25\nISDN\nRT\nNSAP\nNSAP-PTR\nPX\nAPL\nSINK\nGPOS\nUNSPEC\nSPF\nNINFO\nRKEY\nTALINK\nNID\nL32\nL64\nLP\nDOA' > __dns.records
-    printf "\n\e[1;32m ---[ Realizando o scan de DNS ]---\e[0m\n\n"
+    printf "\n\e[1;32m ---[ Scanning DNS ]---\e[0m\n\n"
     
     for __dnsrecord__ in $(cat __dns.records);do
       host -t $__dnsrecord__ "$1" | grep -iEv 'has no|SERVFAIL' 2>/dev/null
@@ -125,22 +125,22 @@ elif [[ ! -z "$*" ]] || ! [[ "$*" =~ [A-Za-z] ]]; then
     #echo -e "Arquivo com DNS criado ($1-DNS)"
     #curl 'https://api.hackertarget.com/dnslookup/?q=^(http|https)://"$1"'
   elif [ "$RESP" = "${RESP#^[Yy]$}" ]; then
-    echo -e "Análise de DNS: ${VERMELHO}[-]${FIM}"
+    echo -e "DNS scan: ${VERMELHO}[-]${FIM}"
   fi
   #######################################################
   
   if [ -z "$RESULTHTTP" ]; then
-    echo -e "\n${VERMELHO}- Banner HTTP não encontrado!${FIM}"
+    echo -e "\n${VERMELHO}- HTTP banner not found!${FIM}"
     false
   else
-    echo -e "\n${AMARELO}+ Resposta em HTTP:${FIM}\n$RESULTHTTP"
+    echo -e "\n${AMARELO}+ HTTP answer:${FIM}\n$RESULTHTTP"
   fi
 
   if [ -z "$RESULTHTTPS" ]; then
-    echo -e "${VERMELHO}- Banner HTTPS não encontrado!${FIM}"
+    echo -e "${VERMELHO}- HTTPS banner not found!${FIM}"
     false
   else
-    echo -e "${AMARELO}+ Resposta em HTTPS:${FIM}\n$RESULTHTTPS"
+    echo -e "${AMARELO}+ HTTPS answer:${FIM}\n$RESULTHTTPS"
   fi
 
   # Randomizando os user agents

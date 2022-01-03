@@ -13,7 +13,7 @@
 
 Program             |  Scanning
 :-------------------------:|:-------------------------:
-![](https://cdn.discordapp.com/attachments/759448770802483200/925885171721457725/unknown.png)  |  ![](https://cdn.discordapp.com/attachments/759448770802483200/925885541713596447/unknown.png)
+![](https://cdn.discordapp.com/attachments/759448770802483200/927674968018419752/unknown.png)  |  ![](https://cdn.discordapp.com/attachments/759448770802483200/927675304913289280/unknown.png)
 
 <h4 align="center">Program designed to collect sub-domains along with the status codes of a given URL using APIs: JonLuca's Anubis, Crt.sh and Omnisint's Sonar. The program's idea is so that the researcher does not have direct contact with the server, leaving the least possible amount of logs inside it and exploring cURL and shell script functionalities.</h4>
 

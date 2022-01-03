@@ -170,7 +170,7 @@ elif [[ ! -z "$*" ]] || ! [[ "$*" =~ [A-Za-z] ]]; then
     )
   USER_AGENT=$(echo ${AGENTS[$RANDOMIZADOR]})
 
-  echo -e "\n${VERDE} ---[ Realizando o scan de Sub-domínios ]---${FIM}\n"
+  echo -e "\n${VERDE} ---[ Scanning Sub-domains ]---${FIM}\n"
 
   # Parte da criação do arquivo url e o scan do status code dele
   touch url
@@ -207,7 +207,7 @@ elif [[ ! -z "$*" ]] || ! [[ "$*" =~ [A-Za-z] ]]; then
   curl -s "https://crt.sh/?q=%25.$1&output=json" | jq -r '.[].name_value' | sed 's/\*\.//g' >> url
   )
   
-  #echo -e "\n+--------------- Scan finalizado: $HORA ---------------+\n" >> url
+  #echo -e "\n+--------------- Finished scan: $HORA ---------------+\n" >> url
 
   # Função para pegar o status code
   STATUS(){
@@ -236,18 +236,18 @@ elif [[ ! -z "$*" ]] || ! [[ "$*" =~ [A-Za-z] ]]; then
 
   # Se o arquivo resp e url existem... + contagem de linhas do resp e url
   if [ -f "$DIRETORIO/resp-$1" ] || [ -f "$DIRETORIO/urls-$1" ]; then
-    echo -e "${AMARELO}+ Arquivo 'resp-$1'\t[$(wc -l resp-"$1" | awk '{print $1}')]\t--> Status Codes\n+ Arquivo 'urls-$1'\t[$(wc -l urls-"$1" | awk '{print $1}')]\t--> Todos os Sub-dominios${FIM}"
+    echo -e "${AMARELO}+ File 'resp-$1'\t[$(wc -l resp-"$1" | awk '{print $1}')]\t--> Status Codes\n+ File 'urls-$1'\t[$(wc -l urls-"$1" | awk '{print $1}')]\t--> All of Sub-domains${FIM}"
   fi
 
   # Se o arquivo url existe, echo. Senão, nada.
   if [[ -f "$DIRETORIO/urls-$1" ]]; then
-    echo -e "\n${AMARELO}Arquivo com subdominios criado!${FIM}"
+    echo -e "\n${AMARELO}File with sub-domains created!${FIM}"
     
     # Recomendação de comando
-    echo -e "\n${AMARELO}+ Dica de comando:${FIM}\ncat urls-$1 | httpx -status-code -follow-redirects -silent -o output.txt"
+    echo -e "\n${AMARELO}+ Cool tip:${FIM}\ncat urls-$1 | httpx -status-code -follow-redirects -silent -o output.txt"
     exit 0
   else
-    echo -e "\n${VERMELHO}Nada foi encontrado nesse domínio!${FIM}\n"
+    echo -e "\n${VERMELHO}Nothing was found on this domain!${FIM}\n"
     exit 1
   fi
   

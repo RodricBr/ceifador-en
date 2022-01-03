@@ -1,65 +1,44 @@
 #!/usr/bin/bash
 
-# Em desenvolvimento e com vários bugs...
-
 # Compatíbilidade com utf-8
 export LANG=C.UTF-8
 
 DIRETORIO=$(dirname "$0")
 
-# Painel de ajuda
-AJUDA(){
-    cat << EOF
-Uso: ${0##*/} <flags>
-    Opções:
-    -u, --uninstall  :: Desinstala o ceifador
-    -h, --help       :: Exibe o painel de ajuda
-EOF
-}
+# Se os parametros estiverem vazios, mensagem de ajuda.. senão(com a URL), executa o programa
+if [[ -z "$*" ]] || [[ "$*" == "-h" ]] || [[ "$*" == "--help" ]]; then
+  echo -e "\nUsage: $0 <URL without http/s>\n\nOptions:"
+  echo -e "$0 -h | --help      :: Show the help pannel\n\
+$0 <URL>            :: Execute ceifador in a determined URL (no HTTP/S in URL)\n\
+sudo ./uninstall     :: Uninstall the program
+"
+#elif [[ ! -z "$*" ]]; then
+elif [[ ! -z "$*" ]] || ! [[ "$*" =~ [A-Za-z] ]]; then
 
-uninstall_(){
-  #cd ~
-  sudo find / -type d -iname ceifador -exec rm -rf {} \; 2>/dev/null
-  echo -e "${0##*/} desinstalado!\nAté a próxima! :("
-  #cd -
-  exit 0
-}
-
-while [[ "$1" ]]; do
-  case "$1" in
-    "--uninstall"|"-u") uninstall_ ;;
-    "--help"|"-h") AJUDA ;;
-    "") MAIN ;;
-    #*) AJUDA && exit 1 ;; #echo -e "Opção inválida!"
-  esac
-  shift
-done
-
-function MAIN(){
   # Se o comando parallel não existe, sai com exit status 1 (erro)
   if [[ -z "$(command -v parallel)" ]]; then
-    echo -e "${AMARELO}PARALLEL não está instalado no seu sistema!${FIM}"
-    echo -e "${AMARELO}Para instalar, execute:${FIM} sudo apt-get install parallel"
+    echo -e "${AMARELO}PARALLEL is not installed in your system!${FIM}"
+    echo -e "${AMARELO}To install, execute:${FIM} sudo apt-get install parallel"
     exit 1
   fi
 
   # Se o programa anew não existe, sai com exit status 1 (erro)
   if [[ -z "$(command -v anew)" ]]; then
-    echo -e "${AMARELO}anew não está instalado no seu sistema!${FIM}"
+    echo -e "${AMARELO}anew is not installed in your system!${FIM}"
     exit 1
   fi
 
   # Se o comando curl não existe, sai com exit status 1 (erro)
   if [[ -z "$(command -v curl)" ]]; then
-    echo -e "${AMARELO}cURL não está instalado no seu sistema!${FIM}"
-    echo -e "${AMARELO}Para instalar, execute:${FIM} sudo apt-get install curl"
+    echo -e "${AMARELO}cURL is not installed in your system!${FIM}"
+    echo -e "${AMARELO}To install, execute:${FIM} sudo apt-get install curl"
     exit 1
   fi
 
   # Se o comando netcat não existe, sai com exit status 1 (erro)
   if [[ -z "$(command -v netcat)" ]]; then
-    echo -e "${AMARELO}cURL não está instalado no seu sistema!${FIM}"
-    echo -e "${AMARELO}Para instalar, execute:${FIM} sudo apt-get install curl"
+    echo -e "${AMARELO}cURL is not installed in your system!${FIM}"
+    echo -e "${AMARELO}To install, execute:${FIM} sudo apt-get install curl"
     exit 1
   fi
 
@@ -73,7 +52,7 @@ function MAIN(){
   trap encerr 2
 
   encerr(){
-    echo -e "\n\n${AMARELO}Processo interrompido\nSaíndo!${FIM}\n"
+    echo -e "\n\n${AMARELO}Process interrupted\nExiting!${FIM}\n"
     exit 130
   }
 
@@ -89,59 +68,72 @@ function MAIN(){
   echo -e ${VERDE}'\t:!:       :!:       :!:  :!:       :!:  !:!  :!:  !:!  :!:  !:!  :!:  !:!  '${FIM}
   echo -e ${VERDE}'\t ::: :::   :: ::::   ::   ::       ::   :::   :::: ::  ::::: ::  ::   :::  '${FIM}
   echo -e ${VERDE}'\t :: :: :  : :: ::   :     :         :   : :  :: :  :    : :  :    :   : :  '${FIM}
-  echo -e "\n${VERDE}\t\t  ~-[${FIM} ${VERMELHO}Criado por: $(echo -e "\033[32;5mRodricBr\033[0m ") ${VERMELHO}| github.com/RodricBr${FIM} ${VERDE}]-~${FIM}\n\n"
+  echo -e "\n${VERDE}\t\t  ~-[${FIM} ${VERMELHO}Made by :   $(echo -e "\033[32;5mRodricBr\033[0m") | github.com/RodricBr${FIM} ${VERDE}]-~${FIM}\n\n"
 
   # Checando se a conexão com o site está ativa
   if nc -zw1 "$1" 443 2>/dev/null ; then
-    echo -e "\n${AMARELO}+ Conexão :${FIM} ${VERDE}OK${FIM}\n"
+    echo -e "\n${AMARELO}+ Connection :${FIM} ${VERDE}OK${FIM}\n"
   else
-    echo -e "\n${AMARELO}+ Conexão:${FIM} ${VERMELHO}OFF${FIM}"
-    echo -e "${VERMELHO}- Sem conexão à internet ou o site!\nSaíndo...${FIM}\n"
+    echo -e "\n${AMARELO}+ Connection:${FIM} ${VERMELHO}OFF${FIM}"
+    echo -e "${VERMELHO}- No connection to internet or the web site!\nExiting...${FIM}\n"
     exit 1
   fi
 
   # Pegando os IPS do alvo (ipv4 e ipv6)
-  echo -e "${AMARELO}+ $1 IP/s:${FIM}\n$(nslookup "$1" | grep -e "Address: " | awk '{print $2}' | tr -t "#" ":")\n"
+  IPS_=$(nslookup "$1" | grep -e "Address: " | awk '{print $2}' | tr -t "#" ":")
+  echo -e "${AMARELO}+ $1 IP/s:${FIM}\n${IPS_}\n"
 
   # Banner grabbing (informações de server)
   WEBHTTP=$(echo "http://$1")
   WEBHTTPS=$(echo "https://$1")
-  RESULTHTTP=$(echo | curl -s -I $WEBHTTP --connect-timeout 3 | grep -e Server:)
-  RESULTHTTPS=$(echo | curl -s -I $WEBHTTPS --connect-timeout 3 | grep -e Server:)
-
+  RESULTHTTP=$(echo | curl -s -I "$WEBHTTP" --connect-timeout 3 | grep -e Server:)
+  RESULTHTTPS=$(echo | curl -s -I "$WEBHTTPS" --connect-timeout 3 | grep -e Server:)
+  
   #######################################################
   # Perguntar se deseja fazer análise de DNS
-
-  HKRDNS(){
-  curl -s "https://api.hackertarget.com/dnslookup/?q=^(http|https)://$1"
-  }
-
-  function ANALISE_DNS {
+  
+  #HKRDNS(){
+  #curl -s "https://api.hackertarget.com/dnslookup/?q=^(http|https)://$1"
+  #curl -s https://api.hackertarget.com/dnslookup/?q="$1"
+  #curl -s https://api.hackertarget.com/hostsearch/?q="$IPS_"
+  #}
+  
+  #function ANALISE_DNS {
   read -n 1 -p "$(echo -e $AMARELO"? Deseja fazer análise de DNS?"$FIM [${VERDE}Y${FIM}/${VERMELHO}n${FIM}]: )" RESP;
-
+  
   case $RESP in
   *[![:alpha:]]*) echo -e "\n$RESP não é uma resposta válida!" ;
     exit 1 ;;
   esac
 
-  [[ "$RESP" != "" ]] && echo "";
+  # Indicando a hora: dia/mês/ano + tempo
+  HORA="$(date +'%d/%m/%y | %T')"
 
+  [[ "$RESP" != "" ]] && echo "";
+  
   if [ "$RESP" = "${RESP#[Nn]}" ]; then
     echo -e "Análise de DNS: ${VERDE}[+]${FIM}"
-    HKRDNS
+    #echo -e "---[ $1 | $HORA ]---" > "$1"-DNS
+    printf 'A\nAAAA\nAFSDB\nAPL\nCAA\nCDNSKEY\nCDS\nCERT\nCNAME\nCSYNC\nDHCID\nDLV\nDNAME\nDNSKEY\nDS\nEUI48\nEUI64\nHINFO\nHIP\nIPSECKEY\nKEY\nKX\nLOC\nMX\nNAPTR\nNS\nNSEC\nNSEC3\nNSEC3PARAM\nOPENPGPKEY\nPTR\nRRSIG\nRP\nSIG\nSMIMEA\nSOA\nSRV\nSSHFP\nTA\nTKEY\nTLSA\nTSIG\nTXT\nURI\nMD\nMF\nMAILA\nMB\nMG\nMR\nMINFO\nMAILB\nWKS\nNULL\nA6\nNXT\nKEY\nSIG\nRP\nX25\nISDN\nRT\nNSAP\nNSAP-PTR\nPX\nAPL\nSINK\nGPOS\nUNSPEC\nSPF\nNINFO\nRKEY\nTALINK\nNID\nL32\nL64\nLP\nDOA' > __dns.records
+    printf "\n\e[1;32m ---[ Realizando o scan de DNS ]---\e[0m\n\n"
+    
+    for __dnsrecord__ in $(cat __dns.records);do
+      host -t $__dnsrecord__ "$1" | grep -iEv 'has no|SERVFAIL' 2>/dev/null
+    done
+    rm -f __dns.records
+
+    #echo -e "Arquivo com DNS criado ($1-DNS)"
     #curl 'https://api.hackertarget.com/dnslookup/?q=^(http|https)://"$1"'
   elif [ "$RESP" = "${RESP#^[Yy]$}" ]; then
     echo -e "Análise de DNS: ${VERMELHO}[-]${FIM}"
   fi
-  }
-  ANALISE_DNS
   #######################################################
-
+  
   if [ -z "$RESULTHTTP" ]; then
-    echo -e "\n\n${VERMELHO}- Banner HTTP não encontrado!${FIM}"
+    echo -e "\n${VERMELHO}- Banner HTTP não encontrado!${FIM}"
     false
   else
-    echo -e "\n\n${AMARELO}+ Resposta em HTTP:${FIM}\n$RESULTHTTP"
+    echo -e "\n${AMARELO}+ Resposta em HTTP:${FIM}\n$RESULTHTTP"
   fi
 
   if [ -z "$RESULTHTTPS" ]; then
@@ -150,13 +142,9 @@ function MAIN(){
   else
     echo -e "${AMARELO}+ Resposta em HTTPS:${FIM}\n$RESULTHTTPS"
   fi
-  ###############################################################################
-
-  # Indicando a hora: dia/mês/ano + tempo
-  HORA="$(date +'%d/%m/%y | %T')"
 
   # Randomizando os user agents
-  NUMBER=$(( $RANDOM % 9 ))
+  RANDOMIZADOR=$(( $RANDOM % 9 ))
   AGENTS=(
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/37.0.2062.94 Chrome/37.0.2062.94 Safari/537.36"
     "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"
@@ -180,11 +168,13 @@ function MAIN(){
     "Mozilla/5.0 (Windows NT 6.1; rv:40.0) Gecko/20100101 Firefox/40.0"
     "Mozilla/5.0 (Windows NT 6.1; rv:31.0) Gecko/20100101 Firefox/31.0"
     )
-  USER_AGENT=$(echo ${AGENTS[$NUMBER]})
+  USER_AGENT=$(echo ${AGENTS[$RANDOMIZADOR]})
+
+  echo -e "\n${VERDE} ---[ Realizando o scan de Sub-domínios ]---${FIM}\n"
 
   # Parte da criação do arquivo url e o scan do status code dele
   touch url
-
+  
   # API Omnisint
   #echo -e "\n---[ + ]--- Omnisint:\n" >> url
   sleep 0.5
@@ -192,9 +182,9 @@ function MAIN(){
   curl -iL -A "$USER_AGENT" "https://sonar.omnisint.io/subdomains/$1" -s -k -H \
   "Referer:$1" | grep -oE "[a-zA-Z0-9._-]+\.$1" >> url
   )
-
+  
   # if curl == 301 ou 302 --max-redirs 2 :: redirect --> sub.exemplo.com
-
+  
   # API Anubis
   #echo -e "\n---[ + ]--- Anubis:\n" >> url
   sleep 0.5
@@ -202,7 +192,7 @@ function MAIN(){
   curl -iL -A "$USER_AGENT" "https://jldc.me/anubis/subdomains/$1" -s -k -H \
   "Referer:$1" | grep -oE "[a-zA-Z0-9._-]+\.$1" >> url
   )
-
+  
   # API Hacker Target
   #echo -e "\n---[ + ]--- HackerTarget:\n" >> url
   HKR=$(
@@ -210,14 +200,13 @@ function MAIN(){
   "Referer:$1" | grep -oE "[a-zA-Z0-9._-]+\.$1" >> url
   )
   sleep 0.5
-
+  
   # CRT.SH
   #echo -e "\n---[ + ]--- crt.sh:\n" >> url
   CRT=$(
   curl -s "https://crt.sh/?q=%25.$1&output=json" | jq -r '.[].name_value' | sed 's/\*\.//g' >> url
   )
-
-  # if curl == 301 ou 302 --max-redirs 2 :: redirect.exemplo.com --> sub.exemplo.com
+  
   #echo -e "\n+--------------- Scan finalizado: $HORA ---------------+\n" >> url
 
   # Função para pegar o status code
@@ -226,17 +215,17 @@ function MAIN(){
       sleep 1
       # cUrl lendário + Follow redirects (Futuro update):
       # echo -e "Url     ::\t$url"; curl -ks -o /dev/null -i -w 'Status  ::\t''%{http_code}'' \nTamanho ::\t'"%{size_download}\n" -H "X-Originally-Forwarded-For: 127.0.0.1, 68.180.194.242" -X GET "${url}" -L
-
+      
       urlstatus=$(curl -o /dev/null -k -s --head --write-out '%{http_code}' "${url}" --max-time 5 -L ) &&
       echo -e "[URL]: $url \t\t[CODE]: $urlstatus" | anew
   }
   export -f STATUS
 
   # 200 'threads/max jobs' (rodando em paralelo)
-  parallel -j100 STATUS :::: url >> resp 2>/dev/null
+  parallel -j200 STATUS :::: url >> resp 2>/dev/null
 
   # Tirando duplicadas usando anew e fazendo ajustes
-  cat resp | anew >> resp-"$1"
+  cat resp | anew > resp-"$1"
   rm resp
   mv url url-"$1"
   cat url-"$1" | anew > urls-"$1"
@@ -253,7 +242,7 @@ function MAIN(){
   # Se o arquivo url existe, echo. Senão, nada.
   if [[ -f "$DIRETORIO/urls-$1" ]]; then
     echo -e "\n${AMARELO}Arquivo com subdominios criado!${FIM}"
-
+    
     # Recomendação de comando
     echo -e "\n${AMARELO}+ Dica de comando:${FIM}\ncat urls-$1 | httpx -status-code -follow-redirects -silent -o output.txt"
     exit 0
@@ -261,4 +250,7 @@ function MAIN(){
     echo -e "\n${VERMELHO}Nada foi encontrado nesse domínio!${FIM}\n"
     exit 1
   fi
-}
+  
+else
+  false
+fi

@@ -1,8 +1,8 @@
 <h1 align="center">~ Ceifador ~</h1> </br>
 
 <p align="center">
-  <a href="#--uso">Usage</a> •
-  <a href="#--instalação">Instalation</a>
+  <a href="#--usage">Usage</a> •
+  <a href="#--instalation">Instalation</a>
 </p>
 
 <!--
@@ -36,30 +36,27 @@ Program             |  Scanning
 > bash ceifador </br>
 
 > ./ceifador </br>
-## - Opções:
+## - Options:
 
 ```markdown
-./ceifador -h | --help  :: Mostrar o painel de ajuda
-./ceifador <URL>        :: Executador o ceifador em uma determinada URL (sem HTTP/S na URL)
-sudo ./uninstall        :: Desinstalar o programa
+./ceifador -h | --help  :: Show the help pannel
+./ceifador <URL>        :: Execute ceifador in a determined URL (no HTTP/S in URL)
+sudo ./uninstall        :: Uninstall the program
 ```
 </br>
 
 ## - OBS:
 
 ```markdown
-# É possível que o script não funcione em zsh e outros tipos de shell, ele só foi testado
-# em bash versão 5 no sistema Debian 10 buster.
-
-# As URLs que não aparecem no arquivo de status code,
-# são aquelas que retornaram status 000 (falhou)
+# URLs that do not appear in the status code file,
+# are those that returned status 000 (failed or timedout)
 ```
 <hr>
 
-### Para fazer:
+### To do:
 
-> Mostrar pra onde a URL é redirecionada, igual a função <br>
-> de seguir redirect no HTTPX (-follow-redirects)
+> Show where the URL is redirected, same as HTTPX's <br>
+> function to follow redirect (-follow-redirects)
 
 <hr>
 

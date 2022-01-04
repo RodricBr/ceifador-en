@@ -10,7 +10,7 @@ if [[ -z "$*" ]] || [[ "$*" == "-h" ]] || [[ "$*" == "--help" ]]; then
   echo -e "\nUsage: $0 <URL without http/s>\n\nOptions:"
   echo -e "$0 -h | --help      :: Show the help pannel\n\
 $0 <URL>            :: Execute ceifador in a determined URL (no HTTP/S in URL)\n\
-sudo ./uninstall     :: Uninstall the program
+sudo ./uninstall            :: Uninstall the program
 "
 #elif [[ ! -z "$*" ]]; then
 elif [[ ! -z "$*" ]] || ! [[ "$*" =~ [A-Za-z] ]]; then

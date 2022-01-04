@@ -21,7 +21,7 @@ Program             |  Results
 
 ## - Instalation:
 
-> git clone https://github.com/rodricbr/ceifador </br>
+> git clone https://github.com/rodricbr/ceifador-en </br>
 
 > cd ceifador/;chmod +x ceifador </br>
 

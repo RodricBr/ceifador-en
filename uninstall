@@ -7,7 +7,7 @@ fi
 
 desinstalar_(){
   #cd ~
-  sudo find / -type d -iname ceifador -exec rm -rf {} \; 2>/dev/null
+  sudo find / -type d -iname ceifador-en -exec rm -rf {} \; 2>/dev/null
   #sudo find / -type f -iname ceifador -exec rm -rf {} \; 2>/dev/null
   echo -e "Ceifador successfully uninstalled!\nUntil next time! <3"
   #cd -
